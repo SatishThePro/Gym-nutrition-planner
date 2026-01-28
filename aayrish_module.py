@@ -105,3 +105,66 @@ MEAL_DB = [
     MealItem("Whey Shake", 200, "Snack"),
     MealItem("Yogurt + Nuts", 300, "Snack"),
 ]
+
+class CalorieCalculator:
+    @staticmethod
+    def bmr(profile):
+        w, h, a = profile.weight_kg, profile.height_cm, profile.age
+        if profile.gender == "Male":
+            return 10*w + 6.25*h - 5*a + 5
+        return 10*w + 6.25*h - 5*a - 161
+
+    @staticmethod
+    def activity_multiplier(days):
+        if days <= 1:
+            return 1.2
+        if days == 2:
+            return 1.35
+        if days == 3:
+            return 1.45
+        if days == 4:
+            return 1.55
+        if days == 5:
+            return 1.65
+        return 1.75
+
+    @classmethod
+    def daily_calories(cls, profile):
+        tdee = cls.bmr(profile) * cls.activity_multiplier(profile.training_days)
+        if profile.goal == "Cut":
+            tdee -= 400
+        elif profile.goal == "Bulk":
+            tdee += 300
+        return int(tdee)
+
+
+class MealItem:
+    def __init__(self, name, calories, tag):
+        self.name = name
+        self.calories = calories
+        self.tag = tag
+
+
+MEAL_DB = [
+    MealItem("Oats + Milk + Banana", 450, "Breakfast"),
+    MealItem("Eggs + Toast", 500, "Breakfast"),
+    MealItem("Chicken Rice Bowl", 650, "Lunch"),
+    MealItem("Paneer Rice Bowl", 700, "Lunch"),
+    MealItem("Chicken Curry + Rice", 750, "Dinner"),
+    MealItem("Paneer Curry + Rice", 800, "Dinner"),
+    MealItem("Whey Shake", 200, "Snack"),
+    MealItem("Yogurt + Nuts", 300, "Snack"),
+]
+
+
+class NutritionRecommender:
+    def recommend(self, target):
+        selected = []
+        total = 0
+        for meal in MEAL_DB:
+            if total + meal.calories <= target:
+                selected.append(meal)
+                total += meal.calories
+        return selected
+
+
