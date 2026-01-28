@@ -99,3 +99,84 @@ def show_exercise_details():
             print("Invalid choice.\n")
     except ValueError:
         print("Invalid input.\n")
+def _level_rank(level):
+    order = {
+        "Beginner": 1,
+        "Intermediate": 2,
+        "Advanced": 3
+    }
+    return order.get(level, 1)
+
+
+def workout_parameters(difficulty):
+    if difficulty == "Beginner":
+        return 3, "10-12", 120
+    if difficulty == "Intermediate":
+        return 4, "8-12", 90
+    return 5, "6-10", 75
+
+
+def recommend_split(days):
+    if days <= 1:
+        return "Full Body", [
+            ["Chest", "Back", "Legs", "Shoulders", "Arms", "Core"]
+        ]
+
+    if days == 2:
+        return "Upper / Lower", [
+            ["Chest", "Back", "Shoulders", "Arms"],
+            ["Legs", "Core"]
+        ]
+
+    if days == 3:
+        return "Push / Pull / Legs", [
+            ["Chest", "Shoulders", "Arms"],
+            ["Back", "Arms"],
+            ["Legs", "Core"]
+        ]
+
+    if days == 4:
+        return "Upper / Lower (4)", [
+            ["Chest", "Back", "Shoulders", "Arms"],
+            ["Legs", "Core"],
+            ["Chest", "Back", "Shoulders", "Arms"],
+            ["Legs", "Core"]
+        ]
+
+    return "Custom Split", [
+        ["Chest", "Back"],
+        ["Legs"],
+        ["Shoulders", "Arms"],
+        ["Core"]
+    ]
+
+
+def _exercise_allowed(profile, exercise):
+    if _level_rank(exercise.difficulty) > _level_rank(profile.difficulty):
+        return False
+
+    if exercise.environment == "Both":
+        return True
+
+    return exercise.environment == profile.environment
+
+
+def generate_workout(profile, muscles, per_muscle=2):
+    sets, reps, rest = workout_parameters(profile.difficulty)
+    workout = []
+
+    for muscle in muscles:
+        count = 0
+        for ex in EXERCISE_DB:
+            if ex.muscle != muscle:
+                continue
+            if not _exercise_allowed(profile, ex):
+                continue
+
+            workout.append((ex, sets, reps, rest))
+            count += 1
+
+            if count >= per_muscle:
+                break
+
+    return workout
