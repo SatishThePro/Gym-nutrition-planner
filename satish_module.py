@@ -180,3 +180,24 @@ def generate_workout(profile, muscles, per_muscle=2):
                 break
 
     return workout
+def show_exercise_details():
+    print("\n--- Exercise Details ---")
+    for i, ex in enumerate(EXERCISE_DB, 1):
+        print(f"{i}) {ex.name} ({ex.muscle}) [{ex.environment}, {ex.difficulty}]")
+
+    try:
+        pick = int(input("Pick exercise number: ").strip())
+        if pick < 1 or pick > len(EXERCISE_DB):
+            print("Invalid choice.\n")
+            return
+
+        ex = EXERCISE_DB[pick - 1]
+        print("\n" + ex.name)
+        print(f"Muscle: {ex.muscle}")
+        print(f"Environment: {ex.environment}")
+        print(f"Difficulty: {ex.difficulty}")
+        print("Form:")
+        print(ex.instructions + "\n")
+
+    except ValueError:
+        print("Invalid input.\n")
