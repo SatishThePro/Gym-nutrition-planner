@@ -1,8 +1,10 @@
 from dataclasses import dataclass
 from typing import List
 
+
 class ValidationError(Exception):
     pass
+
 
 @dataclass
 class UserProfile:
@@ -26,7 +28,8 @@ class UserProfile:
         if self.environment not in ("Home", "Gym"):
             raise ValidationError("Environment must be Home or Gym")
         if self.difficulty not in ("Beginner", "Intermediate", "Advanced"):
-            raise ValidationError("Difficulty must be Beginner, Intermediate or Advanced")
+            raise ValidationError(
+                "Difficulty must be Beginner, Intermediate or Advanced")
         if not (12 <= self.age <= 90):
             raise ValidationError("Age must be between 12 and 90")
         if not (120 <= self.height_cm <= 220):
@@ -35,6 +38,7 @@ class UserProfile:
             raise ValidationError("Weight must be between 30 and 250 kg")
         if not (1 <= self.training_days <= 7):
             raise ValidationError("Training days must be between 1 and 7")
+
 
 class CalorieCalculator:
     @staticmethod
@@ -45,16 +49,22 @@ class CalorieCalculator:
 
     @staticmethod
     def activity_multiplier(days):
-        if days <= 1: return 1.2
-        if days == 2: return 1.35
-        if days == 3: return 1.45
-        if days == 4: return 1.55
-        if days == 5: return 1.65
+        if days <= 1:
+            return 1.2
+        if days == 2:
+            return 1.35
+        if days == 3:
+            return 1.45
+        if days == 4:
+            return 1.55
+        if days == 5:
+            return 1.65
         return 1.75
 
     @classmethod
     def daily_calories(cls, profile):
-        calories = cls.bmr(profile) * cls.activity_multiplier(profile.training_days)
+        calories = cls.bmr(profile) * \
+            cls.activity_multiplier(profile.training_days)
         if profile.goal == "Cut":
             calories -= 400
         elif profile.goal == "Bulk":
@@ -65,11 +75,13 @@ class CalorieCalculator:
             calories = 1200
         return int(calories)
 
+
 @dataclass
 class MealItem:
     name: str
     calories: int
     tag: str
+
 
 class NutritionRecommender:
     def __init__(self, meals):
@@ -77,8 +89,10 @@ class NutritionRecommender:
 
     def recommend(self, target):
         bias = (target - 1600) / 1200
-        if bias < 0: bias = 0
-        if bias > 1: bias = 1
+        if bias < 0:
+            bias = 0
+        if bias > 1:
+            bias = 1
 
         def pick(tag):
             items = [m for m in self.meals if m.tag == tag]
@@ -95,6 +109,7 @@ class NutritionRecommender:
             pick("Snack")
         ]
 
+
 MEAL_DB = [
     MealItem("Oats + Milk + Banana", 450, "Breakfast"),
     MealItem("Eggs + Toast + Fruit", 550, "Breakfast"),
@@ -105,6 +120,7 @@ MEAL_DB = [
     MealItem("Whey Shake", 200, "Snack"),
     MealItem("Yogurt + Nuts", 300, "Snack"),
 ]
+
 
 class CalorieCalculator:
     @staticmethod
@@ -130,7 +146,8 @@ class CalorieCalculator:
 
     @classmethod
     def daily_calories(cls, profile):
-        tdee = cls.bmr(profile) * cls.activity_multiplier(profile.training_days)
+        tdee = cls.bmr(profile) * \
+            cls.activity_multiplier(profile.training_days)
         if profile.goal == "Cut":
             tdee -= 400
         elif profile.goal == "Bulk":
@@ -167,18 +184,30 @@ class NutritionRecommender:
                 total += meal.calories
         return selected
 
+
 def create_or_update_profile_cli(existing=None):
     print("\n--- Create / Update Profile ---")
 
     name = input("Name: ").strip()
     age = int(input("Age: ").strip())
-    gender = input("Gender (Male/Female): ").strip()
+
+    gender = input("Gender (Male/Female): ").strip().lower()
+    gender = gender.capitalize()
+
     height = float(input("Height (cm): ").strip())
     weight = float(input("Weight (kg): ").strip())
-    goal = input("Goal (Cut/Maintain/Bulk): ").strip()
+
+    goal = input("Goal (Cut/Maintain/Bulk): ").strip().lower()
+    goal = goal.capitalize()
+
     days = int(input("Training days per week: ").strip())
-    environment = input("Environment (Home/Gym): ").strip()
-    difficulty = input("Difficulty (Beginner/Intermediate/Advanced): ").strip()
+
+    environment = input("Environment (Home/Gym): ").strip().lower()
+    environment = environment.capitalize()
+
+    difficulty = input(
+        "Difficulty (Beginner/Intermediate/Advanced): ").strip().lower()
+    difficulty = difficulty.capitalize()
 
     profile = UserProfile(
         name=name,
@@ -209,5 +238,3 @@ def print_calories_and_meals(profile):
         total += meal.calories
 
     print(f"Estimated total: {total} kcal\n")
-
-
