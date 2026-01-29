@@ -167,4 +167,47 @@ class NutritionRecommender:
                 total += meal.calories
         return selected
 
+def create_or_update_profile_cli(existing=None):
+    print("\n--- Create / Update Profile ---")
+
+    name = input("Name: ").strip()
+    age = int(input("Age: ").strip())
+    gender = input("Gender (Male/Female): ").strip()
+    height = float(input("Height (cm): ").strip())
+    weight = float(input("Weight (kg): ").strip())
+    goal = input("Goal (Cut/Maintain/Bulk): ").strip()
+    days = int(input("Training days per week: ").strip())
+    environment = input("Environment (Home/Gym): ").strip()
+    difficulty = input("Difficulty (Beginner/Intermediate/Advanced): ").strip()
+
+    profile = UserProfile(
+        name=name,
+        age=age,
+        gender=gender,
+        height_cm=height,
+        weight_kg=weight,
+        goal=goal,
+        training_days=days,
+        environment=environment,
+        difficulty=difficulty
+    )
+
+    profile.validate()
+    return profile
+
+
+def print_calories_and_meals(profile):
+    calories = CalorieCalculator.daily_calories(profile)
+    meals = NutritionRecommender().recommend(calories)
+
+    print(f"\nDaily calorie target: {calories} kcal")
+    print("-" * 40)
+
+    total = 0
+    for meal in meals:
+        print(f"{meal.tag}: {meal.name} ({meal.calories} kcal)")
+        total += meal.calories
+
+    print(f"Estimated total: {total} kcal\n")
+
 
